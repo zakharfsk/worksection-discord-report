@@ -38,19 +38,21 @@ class WorksectionParser:
 
         await page.goto(parser.WORKSECTION_REPORT_URL)
         today = date.today()
+        day_before_today = (today - timedelta(days=1)).strftime("%d.%m.%Y")
 
         if today.weekday() == 0:
             two_days_ago_report = (today - timedelta(days=3)).strftime("%d.%m.%Y")
-            day_before_today = (today - timedelta(days=1)).strftime("%d.%m.%Y")
             logger.info(f"Getting report data during {two_days_ago_report + " - " + day_before_today}")
             await page.locator(Selectors.SELECT_DATE.format(two_days_ago_report)).click()
             await page.locator(Selectors.SELECT_DATE.format(day_before_today)).click()
             await page.locator(Selectors.SUBMIT_CALENDAR_FILTER).click()
+            report_date = f"{two_days_ago_report} - {day_before_today}"
         else:
-            logger.info(f"Receiving data from the {(today - timedelta(days=1)).strftime("%A")} report")
+            logger.info(f"Getting report data from {day_before_today}")
             await page.locator(Selectors.OPEN_CALENDAR).click()
             await page.locator(Selectors.TODAY_DATE).hover()
             await page.locator(Selectors.YESTERDAY_DATE).click()
+            report_date = day_before_today
 
         logger.success("Filter applied")
 
@@ -59,7 +61,7 @@ class WorksectionParser:
         projects_list = await page.locator(Selectors.PROJECTS_LIST).all()
         logger.success("Report data received")
 
-        report = Report(total_sum_time, [])
+        report = Report(report_date, total_sum_time, [])
 
         for task in projects_list:
             project_name = await task.locator(Selectors.PROJECT_NAME).text_content()

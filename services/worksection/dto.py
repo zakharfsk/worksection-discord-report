@@ -10,6 +10,7 @@ class Report:
         - total_time: str - total time spent on tasks
         - projects: list['Project'] - list of projects with tasks
     """
+    date: str
     total_time: str
     projects: list['Project']
 

@@ -31,7 +31,7 @@ async def report_command(ctx: commands.Context):
         return
 
     msg = f"Привіт.\n" + \
-          f"{(datetime.now() - timedelta(days=1)).strftime("%d.%m.%Y")}\n\n" + \
+          f"{report.date}\n\n" + \
           f"Загальний час: {report.total_time}\n\n"
 
     for project in report.projects:
