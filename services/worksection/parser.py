@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from loguru import logger
 from playwright.async_api import async_playwright
 
@@ -27,19 +29,30 @@ class WorksectionParser:
                 await page.locator(Selectors.EMAIL_FIELD).fill(config.WORKSECTION_EMAIL)
                 await page.locator(Selectors.PASSWORD_FIELD).fill(config.WORKSECTION_PASSWORD)
                 await page.locator(Selectors.SUBMIT_LOGIN_BUTTON).click()
+                logger.success("Logged in")
             except Exception as e:
                 logger.error(f"Error while logging in: {e}")
                 await context.close()
                 await browser.close()
                 return
-            finally:
-                logger.success("Logged in")
 
         await page.goto(parser.WORKSECTION_REPORT_URL)
+        today = date.today()
 
-        await page.locator(Selectors.OPEN_CALENDAR).click()
-        await page.locator(Selectors.TODAY_DATE).hover()
-        await page.locator(Selectors.YESTERDAY_DATE).click()
+        if today.weekday() == 0:
+            two_days_ago_report = (today - timedelta(days=3)).strftime("%d.%m.%Y")
+            day_before_today = (today - timedelta(days=1)).strftime("%d.%m.%Y")
+            logger.info(f"Getting report data during {two_days_ago_report + " - " + day_before_today}")
+            await page.locator(Selectors.SELECT_DATE.format(two_days_ago_report)).click()
+            await page.locator(Selectors.SELECT_DATE.format(day_before_today)).click()
+            await page.locator(Selectors.SUBMIT_CALENDAR_FILTER).click()
+        else:
+            logger.info(f"Receiving data from the {(today - timedelta(days=1)).strftime("%A")} report")
+            await page.locator(Selectors.OPEN_CALENDAR).click()
+            await page.locator(Selectors.TODAY_DATE).hover()
+            await page.locator(Selectors.YESTERDAY_DATE).click()
+
+        logger.success("Filter applied")
 
         logger.info("Getting report data")
         total_sum_time = await page.locator(Selectors.TOTAL_SUM_TIME).text_content()

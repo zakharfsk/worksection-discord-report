@@ -5,6 +5,8 @@ class Selectors:
     TOTAL_SUM_TIME = '//*[@id="content_both"]//*[@id="total_summ"]/div/div[2]/span'
 
     OPEN_CALENDAR = '//*[@id="dr_rng"]'
+    SELECT_DATE = '//td[@data-day="{}"]'  # date in format "DD.MM.YYYY"
+    SUBMIT_CALENDAR_FILTER = '//input[@id="tm_but"][@type="button"]'
     TODAY_DATE = '//*[@id="dr_rngmenu"]/div[3]/div[4]/a[2]'
     YESTERDAY_DATE = '//*[@id="dr_rngmenu"]/div[3]/div[4]/a[1]'
 
