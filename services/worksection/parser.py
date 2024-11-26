@@ -75,7 +75,8 @@ class WorksectionParser:
                 if task_time != '—':
                     project.tasks.append(Task(task_name.strip(), task_time.strip()))
 
-            report.projects.append(project)
+            if project.tasks:
+                report.projects.append(project)
 
         await context.close()
         await browser.close()
